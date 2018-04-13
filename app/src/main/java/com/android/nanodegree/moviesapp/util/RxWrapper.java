@@ -23,7 +23,6 @@ public class RxWrapper {
     public interface Action<T> {
 
         T run() throws Throwable;
-
     }
 
     /**

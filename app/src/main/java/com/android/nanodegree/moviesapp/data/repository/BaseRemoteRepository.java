@@ -1,5 +1,8 @@
 package com.android.nanodegree.moviesapp.data.repository;
 
+import com.android.nanodegree.moviesapp.exception.NoInternetConnectionException;
+import com.android.nanodegree.moviesapp.util.BaseConnectionChecker;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +23,10 @@ public class BaseRemoteRepository {
 
     private final String mBaseUrl;
 
-    public BaseRemoteRepository(String baseUrl) {
+    private final BaseConnectionChecker mConnectionChecker;
+
+    public BaseRemoteRepository(BaseConnectionChecker connectionChecker, String baseUrl) {
+        mConnectionChecker = connectionChecker;
         mBaseUrl = baseUrl;
         mServicesMap = new HashMap<>();
     }
@@ -38,6 +44,9 @@ public class BaseRemoteRepository {
     }
 
     protected <T> T execute(Call<T> call) throws Throwable {
+        if (!isNetworkAvailable()) {
+            throw new NoInternetConnectionException();
+        }
         Response<T> response = call.execute();
         if (!response.isSuccessful()) {
             //handle service exceptions
@@ -49,8 +58,8 @@ public class BaseRemoteRepository {
     private Retrofit retrofit() {
 
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .readTimeout(2 * 60, TimeUnit.SECONDS)
-                .connectTimeout(2 * 60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
                 .build();
 
         return new Retrofit.Builder()
@@ -58,5 +67,9 @@ public class BaseRemoteRepository {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
+    }
+
+    private boolean isNetworkAvailable() {
+        return mConnectionChecker != null && mConnectionChecker.isNetworkAvailable();
     }
 }

@@ -7,7 +7,8 @@ package com.android.nanodegree.moviesapp.model;
 public enum QueryType {
 
     MOST_POPULAR ("popular"),
-    TOP_RATED ("top_rated");
+    TOP_RATED ("top_rated"),
+    FAVORITES("favorites");
 
     private final String mValue;
 
@@ -18,9 +19,5 @@ public enum QueryType {
     @Override
     public String toString() {
         return mValue;
-    }
-
-    public boolean equals(QueryType queryType) {
-        return queryType != null && mValue.equals(queryType.toString());
     }
 }

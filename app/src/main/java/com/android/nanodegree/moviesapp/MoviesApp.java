@@ -1,6 +1,8 @@
 package com.android.nanodegree.moviesapp;
 
 import android.app.Application;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 
 /**
  * Created by Khalifa on 3/17/2018.
@@ -22,5 +24,9 @@ public class MoviesApp extends Application {
 
     public static String getStringRes(int stringResId) {
         return sMoviesApp.getString(stringResId);
+    }
+
+    public static Drawable getDrawableRes(int drawableResId) {
+        return ContextCompat.getDrawable(sMoviesApp, drawableResId);
     }
 }
