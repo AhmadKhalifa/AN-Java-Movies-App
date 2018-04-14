@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.android.nanodegree.moviesapp.MoviesApp;
-import com.android.nanodegree.moviesapp.data.storage.sql.handler.MoviesDatabaseHandler;
+import com.android.nanodegree.moviesapp.data.storage.handler.MoviesSQLiteDatabaseHandler;
 
 /**
  * Created by Khalifa on 25/03/2018.
@@ -27,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             synchronized (DatabaseHelper.class) {
                 if (sInstance == null) {
                     sInstance = new DatabaseHelper(
-                            MoviesApp.getApplication().getApplicationContext()
+                            MoviesApp.getApplication()
                     );
                 }
             }
@@ -38,7 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         mDatabaseHandlers = new DatabaseHandler[] {
-                new MoviesDatabaseHandler()
+                new MoviesSQLiteDatabaseHandler()
         };
     }
 
@@ -63,8 +63,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public MoviesDatabaseHandler getMoviesDatabaseHandler() {
-        return (MoviesDatabaseHandler) mDatabaseHandlers[MOVIES_DATABASE_HANDLER_INDEX];
+    public MoviesSQLiteDatabaseHandler getMoviesDatabaseHandler() {
+        return (MoviesSQLiteDatabaseHandler) mDatabaseHandlers[MOVIES_DATABASE_HANDLER_INDEX];
     }
 
     public static abstract class DatabaseHandler {

@@ -1,4 +1,4 @@
-package com.android.nanodegree.moviesapp.ui.recycler;
+package com.android.nanodegree.moviesapp.ui.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

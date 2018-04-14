@@ -34,7 +34,7 @@ public class MoviesDataBaseContracts {
     
     public static class CachedPopularMoviesEntry implements BaseMoviesEntry {
 
-        public static final String TABLE_NAME = "CachedPopularMovies";
+        public static final String TABLE_NAME = "popular";
 
         public static String getCreatingQuery() {
             return MoviesDataBaseContracts.getCreatingQuery(TABLE_NAME);
@@ -47,7 +47,7 @@ public class MoviesDataBaseContracts {
 
     public static class CachedTopRatedMoviesEntry implements BaseMoviesEntry {
 
-        public static final String TABLE_NAME = "CachedTopRatedMovies";
+        public static final String TABLE_NAME = "top_rated";
 
         public static String getCreatingQuery() {
             return MoviesDataBaseContracts.getCreatingQuery(TABLE_NAME);
@@ -60,7 +60,7 @@ public class MoviesDataBaseContracts {
 
     public static class FavoriteMoviesEntry implements BaseMoviesEntry {
 
-        public static final String TABLE_NAME = "CachedFavoriteMovies";
+        public static final String TABLE_NAME = "favorites";
 
         public static String getCreatingQuery() {
             return MoviesDataBaseContracts.getCreatingQuery(TABLE_NAME);

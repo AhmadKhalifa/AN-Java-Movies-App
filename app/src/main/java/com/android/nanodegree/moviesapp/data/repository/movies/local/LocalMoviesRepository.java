@@ -4,9 +4,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import com.android.nanodegree.moviesapp.data.storage.handler.MoviesLocalStorageHandler;
 import com.android.nanodegree.moviesapp.data.storage.sql.contract.MoviesDataBaseContracts;
-import com.android.nanodegree.moviesapp.data.storage.sql.handler.MoviesDatabaseHandler;
-import com.android.nanodegree.moviesapp.data.storage.sql.helper.DatabaseHelper;
+import com.android.nanodegree.moviesapp.data.storage.handler.MoviesSQLiteDatabaseHandler;
 import com.android.nanodegree.moviesapp.model.Movie;
 import com.android.nanodegree.moviesapp.model.QueryType;
 
@@ -18,7 +18,16 @@ import java.util.List;
  * Created by Khalifa on 3/17/2018.
  *
  */
-public class SQLiteLocalMoviesRepository extends BaseLocalMoviesRepository {
+public class LocalMoviesRepository extends BaseLocalMoviesRepository {
+
+    private final MoviesLocalStorageHandler mMoviesLocalStorageHandler;
+
+    public LocalMoviesRepository(MoviesLocalStorageHandler moviesLocalStorageHandler) {
+        if (moviesLocalStorageHandler == null) {
+            throw new IllegalArgumentException("Handler cannot be null");
+        }
+        mMoviesLocalStorageHandler = moviesLocalStorageHandler;
+    }
 
     @Override
     @SuppressWarnings("all")
@@ -26,13 +35,10 @@ public class SQLiteLocalMoviesRepository extends BaseLocalMoviesRepository {
         if (queryType == null) {
             throw new NullPointerException("Query type cannot be null");
         }
-        Cursor moviesCursor = DatabaseHelper
-                .getInstance()
-                .getMoviesDatabaseHandler()
-                .getMoviesCursor(queryType);
+        Cursor moviesCursor = mMoviesLocalStorageHandler.getMoviesCursor(queryType);
         List<Movie> movies = new ArrayList<>();
-        MoviesDatabaseHandler.MoviesCursorWrapper cursorWrapper =
-                new MoviesDatabaseHandler.MoviesCursorWrapper(moviesCursor);
+        MoviesSQLiteDatabaseHandler.MoviesCursorWrapper cursorWrapper =
+                new MoviesSQLiteDatabaseHandler.MoviesCursorWrapper(moviesCursor);
         try {
             if (cursorWrapper.moveToFirst()) {
                 do {
@@ -50,10 +56,8 @@ public class SQLiteLocalMoviesRepository extends BaseLocalMoviesRepository {
         if (queryType == null) {
             throw new NullPointerException("Query type cannot be null");
         }
-        DatabaseHelper
-                .getInstance()
-                .getMoviesDatabaseHandler()
-                .cacheMovies(queryType, getMoviesContentValuesArray(movies));
+        mMoviesLocalStorageHandler.clearTable(queryType);
+        mMoviesLocalStorageHandler.cacheMovies(queryType, getMoviesContentValuesArray(movies));
     }
 
     @Override
@@ -61,10 +65,7 @@ public class SQLiteLocalMoviesRepository extends BaseLocalMoviesRepository {
         if (TextUtils.isEmpty(movieId)) {
             throw new IllegalStateException("Movie id cannot be null or empty");
         }
-        return DatabaseHelper
-                .getInstance()
-                .getMoviesDatabaseHandler()
-                .isFavoriteMovie(movieId);
+        return mMoviesLocalStorageHandler.isFavoriteMovie(movieId);
     }
 
     @Override
@@ -72,10 +73,7 @@ public class SQLiteLocalMoviesRepository extends BaseLocalMoviesRepository {
         if (movie == null) {
             throw new NullPointerException("Movie cannot be null");
         }
-        DatabaseHelper
-                .getInstance()
-                .getMoviesDatabaseHandler()
-                .addMovieToFavorites(getMovieContentValue(movie));
+        mMoviesLocalStorageHandler.addMovieToFavorites(getMovieContentValue(movie));
     }
 
     @Override
@@ -83,22 +81,16 @@ public class SQLiteLocalMoviesRepository extends BaseLocalMoviesRepository {
         if (TextUtils.isEmpty(movieId)) {
             throw new NullPointerException("Movie id cannot be null or empty");
         }
-        DatabaseHelper
-                .getInstance()
-                .getMoviesDatabaseHandler()
-                .removeMovieFromFavorites(movieId);
+        mMoviesLocalStorageHandler.removeMovieFromFavorites(movieId);
     }
 
     @Override
     @SuppressWarnings("all")
     public HashSet<Long> loadFavoriteMoviesIds() {
         HashSet<Long> favoriteMoviesIds = new HashSet<>();
-        Cursor favoriteMoviesIdsCursor = DatabaseHelper
-                .getInstance()
-                .getMoviesDatabaseHandler()
-                .loadFavoriteMoviesIds();
-        MoviesDatabaseHandler.MoviesIdsCursorWrapper cursorWrapper =
-                new MoviesDatabaseHandler.MoviesIdsCursorWrapper(favoriteMoviesIdsCursor);
+        Cursor favoriteMoviesIdsCursor = mMoviesLocalStorageHandler.loadFavoriteMoviesIds();
+        MoviesSQLiteDatabaseHandler.MoviesIdsCursorWrapper cursorWrapper =
+                new MoviesSQLiteDatabaseHandler.MoviesIdsCursorWrapper(favoriteMoviesIdsCursor);
         try {
             if (cursorWrapper.moveToFirst()) {
                 do {

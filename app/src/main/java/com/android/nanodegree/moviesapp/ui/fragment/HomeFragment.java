@@ -18,12 +18,13 @@ import android.widget.TextView;
 
 import com.android.nanodegree.moviesapp.MoviesApp;
 import com.android.nanodegree.moviesapp.R;
-import com.android.nanodegree.moviesapp.data.repository.movies.local.SQLiteLocalMoviesRepository;
+import com.android.nanodegree.moviesapp.data.repository.movies.local.LocalMoviesRepository;
 import com.android.nanodegree.moviesapp.data.repository.movies.remote.RetrofitRemoteMoviesRepository;
+import com.android.nanodegree.moviesapp.data.storage.handler.MoviesContentProviderHandler;
 import com.android.nanodegree.moviesapp.model.Movie;
 import com.android.nanodegree.moviesapp.model.QueryType;
 import com.android.nanodegree.moviesapp.mvp.home.HomePresenter;
-import com.android.nanodegree.moviesapp.ui.recycler.HomeMoviesAdapter;
+import com.android.nanodegree.moviesapp.ui.adapter.HomeMoviesAdapter;
 import com.android.nanodegree.moviesapp.util.BaseConnectionChecker;
 import com.android.nanodegree.moviesapp.mvp.home.HomeView;
 import com.android.nanodegree.moviesapp.util.ConnectionChecker;
@@ -191,7 +192,7 @@ public class HomeFragment extends BaseFragment<HomePresenter>
     @Override
     protected HomePresenter createPresenter() {
         return new HomePresenter(
-                new SQLiteLocalMoviesRepository(),
+                new LocalMoviesRepository(new MoviesContentProviderHandler()),
                 new RetrofitRemoteMoviesRepository(
                         mConnectionChecker,
                         MoviesApp.getStringRes(R.string.tmdb_api_key),

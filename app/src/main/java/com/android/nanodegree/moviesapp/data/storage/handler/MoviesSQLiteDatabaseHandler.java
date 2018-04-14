@@ -1,9 +1,11 @@
-package com.android.nanodegree.moviesapp.data.storage.sql.handler;
+package com.android.nanodegree.moviesapp.data.storage.handler;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.android.nanodegree.moviesapp.data.storage.sql.contract.MoviesDataBaseContracts;
@@ -15,7 +17,8 @@ import com.android.nanodegree.moviesapp.model.QueryType;
  * Created by Khalifa on 25/03/2018.
  *
  */
-public class MoviesDatabaseHandler extends DatabaseHelper.DatabaseHandler {
+public class MoviesSQLiteDatabaseHandler extends DatabaseHelper.DatabaseHandler
+        implements MoviesLocalStorageHandler {
 
     @Override
     protected void onCreate(SQLiteDatabase sqLiteDatabase) {
@@ -44,23 +47,10 @@ public class MoviesDatabaseHandler extends DatabaseHelper.DatabaseHandler {
         onCreate(sqLiteDatabase);
     }
 
-    public Cursor getMoviesCursor(QueryType queryType) throws Exception {
-        String tableName;
-        switch (queryType) {
-            case MOST_POPULAR:
-                tableName = MoviesDataBaseContracts.CachedPopularMoviesEntry.TABLE_NAME;
-                break;
-            case TOP_RATED:
-                tableName = MoviesDataBaseContracts.CachedTopRatedMoviesEntry.TABLE_NAME;
-                break;
-            case FAVORITES:
-                tableName = MoviesDataBaseContracts.FavoriteMoviesEntry.TABLE_NAME;
-                break;
-            default:
-                throw new NullPointerException("Table name cannot be null");
-        }
+    @Override
+    public Cursor getMoviesCursor(@NonNull QueryType queryType) {
         return DatabaseHelper.getInstance().getDatabase().query(
-                tableName,
+                queryType.toString(),
                 null,
                 null,
                 null,
@@ -70,7 +60,8 @@ public class MoviesDatabaseHandler extends DatabaseHelper.DatabaseHandler {
         );
     }
 
-    public boolean isFavoriteMovie(String movieId) throws Exception {
+    @Override
+    public boolean isFavoriteMovie(@NonNull String movieId) {
         Cursor cursor =  DatabaseHelper.getInstance().getDatabase().query(
                 MoviesDataBaseContracts.FavoriteMoviesEntry.TABLE_NAME,
                 null,
@@ -87,40 +78,31 @@ public class MoviesDatabaseHandler extends DatabaseHelper.DatabaseHandler {
         return isFavoriteMovie;
     }
 
-    public void addMovieToFavorites(ContentValues values) throws Exception {
+    @Override
+    public void addMovieToFavorites(@NonNull ContentValues values) {
         if (DatabaseHelper.getInstance().getDatabase().insertWithOnConflict(
                 MoviesDataBaseContracts.FavoriteMoviesEntry.TABLE_NAME,
                 null,
                 values,
                 SQLiteDatabase.CONFLICT_REPLACE) == -1) {
-            throw new Exception("Error adding movie to favorites");
+            throw new SQLiteException("Error adding movie to favorites");
         }
     }
 
-    public void removeMovieFromFavorites(String movieId) throws Exception {
+    @Override
+    public void removeMovieFromFavorites(@NonNull String movieId) {
         if (DatabaseHelper.getInstance().getDatabase().delete(
                 MoviesDataBaseContracts.FavoriteMoviesEntry.TABLE_NAME,
                 MoviesDataBaseContracts.BaseMoviesEntry._ID + "=?",
                 new String[] {movieId}) == 0) {
-            throw new Exception("Error removing movie from favorites");
+            throw new SQLiteException("Error removing movie from favorites");
         }
     }
 
-    public void cacheMovies(QueryType queryType, ContentValues[] moviesContentValues)
-            throws Exception {
-        String tableName;
-        switch (queryType) {
-            case MOST_POPULAR:
-                tableName = MoviesDataBaseContracts.CachedPopularMoviesEntry.TABLE_NAME;
-                clearTable(tableName);
-                break;
-            case TOP_RATED:
-                tableName = MoviesDataBaseContracts.CachedTopRatedMoviesEntry.TABLE_NAME;
-                clearTable(tableName);
-                break;
-            default:
-                throw new NullPointerException("Query type cannot be null");
-        }
+    @Override
+    public void cacheMovies(@NonNull QueryType queryType,
+                            @NonNull ContentValues[] moviesContentValues) {
+        String tableName = queryType.toString();
         SQLiteDatabase moviesDatabase = DatabaseHelper.getInstance().getDatabase();
         moviesDatabase.beginTransaction();
         int rowsInserted = 0;
@@ -133,23 +115,25 @@ public class MoviesDatabaseHandler extends DatabaseHelper.DatabaseHandler {
             if (rowsInserted == moviesContentValues.length) {
                 moviesDatabase.setTransactionSuccessful();
             } else {
-                throw new Exception("Error caching all movies.");
+                throw new SQLiteException("Error caching all movies.");
             }
         } finally {
             moviesDatabase.endTransaction();
         }
     }
 
-    private void clearTable(String tableName) throws Exception {
-        if (!TextUtils.isEmpty(tableName)) {
+    @Override
+    public void clearTable(@NonNull QueryType queryType) {
+        if (!TextUtils.isEmpty(queryType.toString())) {
             DatabaseHelper.getInstance().getDatabase().delete(
-                    tableName,
+                    queryType.toString(),
                     null,
                     null
             );
         }
     }
 
+    @Override
     public Cursor loadFavoriteMoviesIds() {
         return DatabaseHelper.getInstance().getDatabase().query(
                 MoviesDataBaseContracts.FavoriteMoviesEntry.TABLE_NAME,

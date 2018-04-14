@@ -19,13 +19,14 @@ import android.widget.TextView;
 
 import com.android.nanodegree.moviesapp.MoviesApp;
 import com.android.nanodegree.moviesapp.R;
-import com.android.nanodegree.moviesapp.data.repository.movies.local.SQLiteLocalMoviesRepository;
+import com.android.nanodegree.moviesapp.data.repository.movies.local.LocalMoviesRepository;
 import com.android.nanodegree.moviesapp.data.repository.movies.remote.RetrofitRemoteMoviesRepository;
+import com.android.nanodegree.moviesapp.data.storage.handler.MoviesContentProviderHandler;
 import com.android.nanodegree.moviesapp.model.Movie;
 import com.android.nanodegree.moviesapp.mvp.movieDetails.MovieDetailsPresenter;
 import com.android.nanodegree.moviesapp.mvp.movieDetails.MovieDetailsView;
-import com.android.nanodegree.moviesapp.ui.recycler.MovieReviewsAdapter;
-import com.android.nanodegree.moviesapp.ui.recycler.MovieTrailersAdapter;
+import com.android.nanodegree.moviesapp.ui.adapter.MovieReviewsAdapter;
+import com.android.nanodegree.moviesapp.ui.adapter.MovieTrailersAdapter;
 import com.android.nanodegree.moviesapp.util.ConnectionChecker;
 import com.android.nanodegree.moviesapp.util.DateFormatter;
 import com.squareup.picasso.Picasso;
@@ -336,7 +337,7 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter>
     @Override
     protected MovieDetailsPresenter createPresenter() {
         return new MovieDetailsPresenter(
-                new SQLiteLocalMoviesRepository(),
+                new LocalMoviesRepository(new MoviesContentProviderHandler()),
                 new RetrofitRemoteMoviesRepository(
                         new ConnectionChecker(),
                         MoviesApp.getStringRes(R.string.tmdb_api_key),
