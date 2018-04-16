@@ -105,7 +105,7 @@ public class MovieDetailsFragment extends BaseFragment<MovieDetailsPresenter>
 
     public static MovieDetailsFragment newInstance(Movie movie) {
         if (movie == null) {
-            throw new IllegalStateException("Movie cannot be null!");
+            throw new IllegalArgumentException("Movie cannot be null!");
         }
         MovieDetailsFragment fragment = new MovieDetailsFragment();
         Bundle arguments = new Bundle();

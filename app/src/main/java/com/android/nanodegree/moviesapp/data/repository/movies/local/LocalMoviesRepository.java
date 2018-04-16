@@ -33,7 +33,7 @@ public class LocalMoviesRepository extends BaseLocalMoviesRepository {
     @SuppressWarnings("all")
     public List<Movie> loadMovies(QueryType queryType) throws Exception {
         if (queryType == null) {
-            throw new NullPointerException("Query type cannot be null");
+            throw new IllegalArgumentException("Query type cannot be null");
         }
         Cursor moviesCursor = mMoviesLocalStorageHandler.getMoviesCursor(queryType);
         List<Movie> movies = new ArrayList<>();
@@ -54,7 +54,7 @@ public class LocalMoviesRepository extends BaseLocalMoviesRepository {
     @Override
     public void cacheMovies(QueryType queryType, List<Movie> movies) throws Exception {
         if (queryType == null) {
-            throw new NullPointerException("Query type cannot be null");
+            throw new IllegalArgumentException("Query type cannot be null");
         }
         mMoviesLocalStorageHandler.clearTable(queryType);
         mMoviesLocalStorageHandler.cacheMovies(queryType, getMoviesContentValuesArray(movies));
@@ -63,7 +63,7 @@ public class LocalMoviesRepository extends BaseLocalMoviesRepository {
     @Override
     public boolean isFavoriteMovie(String movieId) throws Exception {
         if (TextUtils.isEmpty(movieId)) {
-            throw new IllegalStateException("Movie id cannot be null or empty");
+            throw new IllegalArgumentException("Movie id cannot be null or empty");
         }
         return mMoviesLocalStorageHandler.isFavoriteMovie(movieId);
     }
@@ -71,7 +71,7 @@ public class LocalMoviesRepository extends BaseLocalMoviesRepository {
     @Override
     public void addMovieToFavorites(Movie movie) throws Exception {
         if (movie == null) {
-            throw new NullPointerException("Movie cannot be null");
+            throw new IllegalArgumentException("Movie cannot be null");
         }
         mMoviesLocalStorageHandler.addMovieToFavorites(getMovieContentValue(movie));
     }
@@ -79,7 +79,7 @@ public class LocalMoviesRepository extends BaseLocalMoviesRepository {
     @Override
     public void removeMovieFromFavorites(String movieId) throws Exception {
         if (TextUtils.isEmpty(movieId)) {
-            throw new NullPointerException("Movie id cannot be null or empty");
+            throw new IllegalArgumentException("Movie id cannot be null or empty");
         }
         mMoviesLocalStorageHandler.removeMovieFromFavorites(movieId);
     }
